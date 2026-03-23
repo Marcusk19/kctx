@@ -18,6 +18,19 @@ fi
 
 export KUBECONFIG="${HOME}/.kctx/sessions/${KCTX_SESSION}/config:${KCTX_ORIGINAL_KUBECONFIG:-${HOME}/.kube/config}"
 
+oc() {
+  if [ "$1" = "login" ]; then
+    local _kctx_kubeconfig="$KUBECONFIG"
+    export KUBECONFIG="${KCTX_ORIGINAL_KUBECONFIG:-${HOME}/.kube/config}"
+    command oc "$@"
+    local _kctx_rc=$?
+    export KUBECONFIG="$_kctx_kubeconfig"
+    [ $_kctx_rc -eq 0 ] && kctx _sync-context 2>/dev/null
+    return $_kctx_rc
+  fi
+  command oc "$@"
+}
+
 trap '%s _cleanup-session 2>/dev/null' EXIT
 `, "kctx", "kctx")
 }

@@ -41,6 +41,8 @@ func Run() {
 		runInitSession()
 	case "_cleanup-session":
 		runCleanupSession()
+	case "_sync-context":
+		runSyncContext()
 	case "-":
 		runSwitchPrevious()
 	case "--help", "-h", "help":

@@ -22,6 +22,19 @@ else
   set -gx KUBECONFIG "$HOME/.kctx/sessions/$KCTX_SESSION/config:$HOME/.kube/config"
 end
 
+function oc
+  if test (count $argv) -gt 0; and test "$argv[1]" = "login"
+    set -l _kctx_kubeconfig $KUBECONFIG
+    set -gx KUBECONFIG (test -n "$KCTX_ORIGINAL_KUBECONFIG"; and echo "$KCTX_ORIGINAL_KUBECONFIG"; or echo "$HOME/.kube/config")
+    command oc $argv
+    set -l _kctx_rc $status
+    set -gx KUBECONFIG "$_kctx_kubeconfig"
+    test $_kctx_rc -eq 0; and kctx _sync-context 2>/dev/null
+    return $_kctx_rc
+  end
+  command oc $argv
+end
+
 function __kctx_cleanup --on-event fish_exit
   %s _cleanup-session 2>/dev/null
 end
